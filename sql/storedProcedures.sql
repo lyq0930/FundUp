@@ -28,7 +28,7 @@ create trigger EnoughFundForProject
 before update on Project
 for each row
   begin
-    if new.fundSoFar >= new.maxFund
+    if new.pstatus != 'Completed' and new.fundSoFar >= new.maxFund
     then set new.pstatus = 'Funded, in progessing';
       update Fund F
       set moneyStatus = 'Released'

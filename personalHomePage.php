@@ -111,6 +111,74 @@ function projectPost($pid, $pname, $powner, $tags, $pdescription, $endFundTime, 
     </div>
     ";
 }
+
+//GET LIKED PROJECT
+$stmt = $pdo -> prepare(
+    "Select P.pid, pname, pdescription, pOwner, tags, Date(projectCreatedTime) createT, Date(endFundTime) endFT,
+                                               Date(completionDate) endPT, minFund, maxFund, fundSoFar, pstatus, cover
+                  From Project P JOIN UserLikes U using (pid)
+                  WHERE U.username = :username
+                  ORDER BY createT
+                  LIMIT 3"
+);
+$stmt -> execute([':username' => $username]);
+$likedProject = $stmt -> fetchAll();
+
+function showLikedProject($likedProject){
+    $pid = $likedProject['pid'];
+    $pname = $likedProject['pname'];
+    $createT = $likedProject['createT'];
+
+    echo "
+        <div class='spost clearfix'>
+            <div class='entry-image'>
+                <a href='project.php?pid=$pid' class='nobg'><img src='projectimage.php?pid=$pid' alt=''></a>
+            </div>
+            <div class='entry-c'>
+                <div class='entry-title'>
+                    <h4><a href='project.php?pid=$pid'>$pname</a></h4>
+                </div>
+                <ul class='entry-meta'>
+                    <li>$createT</li>
+                </ul>
+            </div>
+        </div>
+    ";
+}
+
+//GET COMMENTS
+$stmt = $pdo -> prepare(
+    "Select *
+                  From Discussion
+                  WHERE username = :username
+                  ORDER BY commentPostedTime
+                  LIMIT 3"
+);
+$stmt -> execute([':username' => $username]);
+$commented = $stmt -> fetchAll();
+
+function showComments($commented){
+    $comment = $commented['aComment'];
+    $oldPostedT = $commented['commentPostedTime'];
+    $postedT =date_format(date_create($oldPostedT), 'Y-m-d');
+
+    echo "
+        <div class='fslider testimonial noborder nopadding noshadow' data-animation='slide' data-arrows='false'>
+            <div class='flexslider'>
+                <div class='slider-wrap'>
+                    <div class='slide'>
+                        <div class='testi-content'>
+                            <p>$comment</p>
+                            <ul class='entry-meta'>
+                                <li>$postedT</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ";
+}
 ?>
     <!-- Page Title
     ============================================= -->
@@ -191,161 +259,26 @@ function projectPost($pid, $pname, $powner, $tags, $pdescription, $endFundTime, 
                                 <a href="newproject.php" class="button button-3d button-rounded button-teal">Create a new project</a>
 							</div>
 
-							<div class="widget clearfix">
+                            <div class="widget clearfix">
+                                <h4>Recent Liked Posts</h4>
+                                <div id="post-list-footer">
 
-								<h4>Flickr Photostream</h4>
-								<div id="flickr-widget" class="flickr-feed masonry-thumbs" data-id="613394@N22" data-count="16" data-type="group" data-lightbox="gallery"></div>
+                                    <?php
+                                    foreach($likedProject as $row) {
+                                        showLikedProject($row);
+                                    }
+                                    ?>
+                                </div>
+                            </div>
 
-							</div>
-
-							<div class="widget clearfix">
-
-								<div class="tabs nobottommargin clearfix" id="sidebar-tabs">
-
-									<ul class="tab-nav clearfix">
-										<li><a href="#tabs-1">Popular</a></li>
-										<li><a href="#tabs-2">Recent</a></li>
-										<li><a href="#tabs-3"><i class="icon-comments-alt norightmargin"></i></a></li>
-									</ul>
-
-									<div class="tab-container">
-
-										<div class="tab-content clearfix" id="tabs-1">
-											<div id="popular-post-list-sidebar">
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/magazine/small/3.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<div class="entry-title">
-															<h4><a href="#">Debitis nihil placeat, illum est nisi</a></h4>
-														</div>
-														<ul class="entry-meta">
-															<li><i class="icon-comments-alt"></i> 35 Comments</li>
-														</ul>
-													</div>
-												</div>
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/magazine/small/2.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<div class="entry-title">
-															<h4><a href="#">Elit Assumenda vel amet dolorum quasi</a></h4>
-														</div>
-														<ul class="entry-meta">
-															<li><i class="icon-comments-alt"></i> 24 Comments</li>
-														</ul>
-													</div>
-												</div>
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/magazine/small/1.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<div class="entry-title">
-															<h4><a href="#">Lorem ipsum dolor sit amet, consectetur</a></h4>
-														</div>
-														<ul class="entry-meta">
-															<li><i class="icon-comments-alt"></i> 19 Comments</li>
-														</ul>
-													</div>
-												</div>
-
-											</div>
-										</div>
-										<div class="tab-content clearfix" id="tabs-2">
-											<div id="recent-post-list-sidebar">
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/magazine/small/1.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<div class="entry-title">
-															<h4><a href="#">Lorem ipsum dolor sit amet, consectetur</a></h4>
-														</div>
-														<ul class="entry-meta">
-															<li>10th July 2014</li>
-														</ul>
-													</div>
-												</div>
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/magazine/small/2.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<div class="entry-title">
-															<h4><a href="#">Elit Assumenda vel amet dolorum quasi</a></h4>
-														</div>
-														<ul class="entry-meta">
-															<li>10th July 2014</li>
-														</ul>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="tab-content clearfix" id="tabs-3">
-											<div id="recent-post-list-sidebar">
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/icons/avatar.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<strong>John Doe:</strong> Veritatis recusandae sunt repellat distinctio...
-													</div>
-												</div>
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/icons/avatar.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<strong>Mary Jane:</strong> Possimus libero, earum officia architecto maiores....
-													</div>
-												</div>
-
-												<div class="spost clearfix">
-													<div class="entry-image">
-														<a href="#" class="nobg"><img class="img-circle" src="images/icons/avatar.jpg" alt=""></a>
-													</div>
-													<div class="entry-c">
-														<strong>Site Admin:</strong> Deleniti magni labore laboriosam odio...
-													</div>
-												</div>
-
-											</div>
-										</div>
-
-									</div>
-
-								</div>
-
-							</div>
-
-
-							<div class="widget clearfix">
-
-								<h4>Tag Cloud</h4>
-								<div class="tagcloud">
-									<a href="#">general</a>
-									<a href="#">videos</a>
-									<a href="#">music</a>
-									<a href="#">media</a>
-									<a href="#">photography</a>
-									<a href="#">parallax</a>
-									<a href="#">ecommerce</a>
-									<a href="#">terms</a>
-									<a href="#">coupons</a>
-									<a href="#">modern</a>
-								</div>
-
-							</div>
+                            <div class="widget clearfix">
+                                <h4>Recent Comments</h4>
+                                <?php
+                                foreach($commented as $row) {
+                                    showComments($row);
+                                }
+                                ?>
+                            </div>
 
 						</div>
 

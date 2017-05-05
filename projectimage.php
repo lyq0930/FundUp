@@ -10,17 +10,21 @@ require_once ('include/dbconfig.php');
 header("Content-type: image/JPEG",true);
 header("Content-type: image/PNG",true);
 
+$pid = $_GET['pid'];
 $pdo = db_connect();
 if (isset($_GET['updateTime'])) {
-    $stmt = $pdo -> prepare("Select * from ProjectDetails where pid = :pid and updateTime = :updateTime");
-    $stmt -> execute([':pid' => $_GET['pid']], [':updateTime' => $_GET['pid']]);
+    $updatTime = $_GET['updateTime'];
+    $stmt = $pdo -> prepare("Select updateContent img from ProjectDetails where pid = :pid and updateTime = :updateTime");
+    $stmt -> bindParam(":pid", $pid, $pdo::PARAM_INT);
+    $stmt -> bindParam(":updateTime", $updatTime, $pdo::PARAM_STR);
+    $stmt -> execute();
 } else {
-    $stmt = $pdo->prepare("SELECT cover FROM Project WHERE pid = :pid");
+    $stmt = $pdo->prepare("SELECT cover img FROM Project WHERE pid = :pid");
     $stmt->execute([':pid' => $_GET['pid']]) or die("Cannot get image(s) for the project");
 }
 $result = $stmt -> fetch();
-if (!isset($result['cover'])) {
+if (!isset($result['img'])) {
     echo file_get_contents("images/default_image.jpeg");
 } else {
-    echo $result['cover'];
+    echo $result['img'];
 }
