@@ -89,17 +89,17 @@ $username = $_SESSION['username'];
                     <!-- Top Account
 ============================================= -->
                     <div id="top-account" class="dropdown">
-                        <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="icon-user"></i><i class="icon-angle-down"></i></a>
+                        <a href="" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="icon-user"></i><i class="icon-angle-down"></i></a>
                         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
                             <li><a href="logout.php">Logout <i class="icon-signout"></i></a></li>
                         </ul>
                     </div>
-
                 </nav><!-- #primary-menu end -->
 
             </div>
 
         </div>
+
         <style>
 
             .white-section {

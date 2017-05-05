@@ -2,8 +2,20 @@
 session_start();
 require_once ('include/header.php');
 require_once ('include/dbconfig.php');
+$username = $_SESSION['username'];
 $keyword = "%" . $_GET['q'] . "%";
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+    "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "search for";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $_GET['q'], $pdo::PARAM_STR);
+$log -> execute();
+
 $stmt = $pdo -> prepare(
         "select *
                    from Project

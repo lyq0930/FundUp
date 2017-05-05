@@ -179,6 +179,48 @@ function showComments($commented){
         </div>
     ";
 }
+
+function showLogs($log){
+    $username = $log['username'];
+    $operation = $log['operation'];
+    $target = $log['target'];
+    $postedT =date_format(date_create($log['logTime']), 'Y-m-d');
+
+    echo "
+        <div class='fslider testimonial noborder nopadding noshadow' data-animation='slide' data-arrows='false'>
+            <div class='flexslider'>
+                <div class='slider-wrap'>
+                    <div class='slide'>
+                        <div class='testi-content'>
+                            <p>";
+    switch ($operation) {
+        case "look project" :
+            echo "<a href='user.php?username=$username'>$username</a> $operation <a href='project.php?pid=$target'>$target</a>";
+            break;
+        case "look tags":
+            echo "<a href='user.php?username=$username'>$username</a> $operation <a href='projectbucket.php?pid=$target'>$target</a>";
+            break;
+        case "follow":
+            echo "<a href='user.php?username=$username'>$username</a> $operation <a href='user.php?username=$target'>$target</a>";
+            break;
+        case "comment":
+            echo "<a href='user.php?username=$username'>$username</a> $operation <a href='project.php?pid=$target'>$target</a>";
+            break;
+        case "pledge":
+            echo "<a href='user.php?username=$username'>$username</a> $operation <a href='project.php?pid=$target'>$target</a>";
+            break;
+    }
+    echo "                  </p>
+                            <ul class='entry-meta'>
+                                <li>$postedT</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ";
+}
 ?>
     <!-- Page Title
     ============================================= -->
@@ -272,10 +314,29 @@ function showComments($commented){
                             </div>
 
                             <div class="widget clearfix">
-                                <h4>Recent Comments</h4>
+                                <h4>Recent Activities</h4>
                                 <?php
                                 foreach($commented as $row) {
                                     showComments($row);
+                                }
+                                ?>
+                            </div>
+
+                            <div class="widget clearfix">
+                                <h4>Recent Comments</h4>
+                                <?php
+                                $log = $pdo -> prepare(
+                                    "select *
+                                               from Log
+                                               where username = :username
+                                               order by logTime DESC
+                                               limit 5"
+                                );
+                                $log -> bindParam(":username", $username, $pdo::PARAM_STR);
+                                $log -> execute();
+                                $logs = $log -> fetchAll();
+                                foreach ($logs as $row) {
+                                    showLogs($row);
                                 }
                                 ?>
                             </div>

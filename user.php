@@ -1,4 +1,5 @@
 <?php
+session_start();
 /**
  * Created by PhpStorm.
  * User: emily
@@ -7,6 +8,12 @@
  */
 require_once('include/header.php');
 require_once ('include/dbconfig.php');
+if (!isset($_SESSION['username'])) {
+    $url = "login_register.php";
+    echo "<script type='text/javascript'>";
+    echo "window.location.href='$url'";
+    echo "</script>";
+}
 $username = $_SESSION['username'];
 $aPerson = $_GET['username'];
 $pdo = db_connect();
