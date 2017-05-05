@@ -4,6 +4,7 @@ require_once ('include/header.html');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 $pid = $_GET['pid'];
+$username = $_SESSION['username'];
 $pdo = db_connect();
 
 $stmt = $pdo -> prepare(
@@ -146,6 +147,7 @@ function displayComments($username, $aComment, $commentPostedTime) {
                                     <p><?php echo $project['pdescription'];?></p>
                                     <?php
                                     if (isset($projectUpdates)) {
+                                        echo "<div class='line'></div>";
                                         echo "<h4>Update</h4>";
                                         foreach ($projectUpdates as $row) {
                                             $updateTime = $row['updateTime'];
@@ -226,87 +228,7 @@ function displayComments($username, $aComment, $commentPostedTime) {
 									Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores, eveniet, eligendi et nobis neque minus mollitia sit repudiandae ad repellendus recusandae blanditiis praesentium vitae ab sint earum voluptate velit beatae alias fugit accusantium laboriosam nisi reiciendis deleniti tenetur molestiae maxime id quaerat consequatur fugiat aliquam laborum nam aliquid. Consectetur, perferendis?
 								</div>
 							</div><!-- Post Single - Author End -->
-
-							<div class="line"></div>
-
-							<h4>Related Posts:</h4>
-
-							<div class="related-posts clearfix">
-
-								<div class="col_half nobottommargin">
-
-									<div class="mpost clearfix">
-										<div class="entry-image">
-											<a href="#"><img src="images/blog/small/10.jpg" alt="Blog Single"></a>
-										</div>
-										<div class="entry-c">
-											<div class="entry-title">
-												<h4><a href="#">This is an Image Post</a></h4>
-											</div>
-											<ul class="entry-meta clearfix">
-												<li><i class="icon-calendar3"></i> 10th July 2014</li>
-												<li><a href="#"><i class="icon-comments"></i> 12</a></li>
-											</ul>
-											<div class="entry-content">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia nisi perferendis.</div>
-										</div>
-									</div>
-
-									<div class="mpost clearfix">
-										<div class="entry-image">
-											<a href="#"><img src="images/blog/small/20.jpg" alt="Blog Single"></a>
-										</div>
-										<div class="entry-c">
-											<div class="entry-title">
-												<h4><a href="#">This is a Video Post</a></h4>
-											</div>
-											<ul class="entry-meta clearfix">
-												<li><i class="icon-calendar3"></i> 24th July 2014</li>
-												<li><a href="#"><i class="icon-comments"></i> 16</a></li>
-											</ul>
-											<div class="entry-content">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia nisi perferendis.</div>
-										</div>
-									</div>
-
-								</div>
-
-								<div class="col_half nobottommargin col_last">
-
-									<div class="mpost clearfix">
-										<div class="entry-image">
-											<a href="#"><img src="images/blog/small/21.jpg" alt="Blog Single"></a>
-										</div>
-										<div class="entry-c">
-											<div class="entry-title">
-												<h4><a href="#">This is a Gallery Post</a></h4>
-											</div>
-											<ul class="entry-meta clearfix">
-												<li><i class="icon-calendar3"></i> 8th Aug 2014</li>
-												<li><a href="#"><i class="icon-comments"></i> 8</a></li>
-											</ul>
-											<div class="entry-content">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia nisi perferendis.</div>
-										</div>
-									</div>
-
-									<div class="mpost clearfix">
-										<div class="entry-image">
-											<a href="#"><img src="images/blog/small/22.jpg" alt="Blog Single"></a>
-										</div>
-										<div class="entry-c">
-											<div class="entry-title">
-												<h4><a href="#">This is an Audio Post</a></h4>
-											</div>
-											<ul class="entry-meta clearfix">
-												<li><i class="icon-calendar3"></i> 22nd Aug 2014</li>
-												<li><a href="#"><i class="icon-comments"></i> 21</a></li>
-											</ul>
-											<div class="entry-content">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia nisi perferendis.</div>
-										</div>
-									</div>
-
-								</div>
-
-							</div>
-							<!-- Comments
+                            <!-- Comments
 							============================================= -->
 							<div id="comments" class="clearfix">
 
@@ -366,36 +288,39 @@ function displayComments($username, $aComment, $commentPostedTime) {
                                 <div class="portfolio-desc">
                                     <ul class="iconlist">
                                         <li><i class="icon-ok"></i> <strong>Created:</strong> <?php echo $project['createT']?></li>
-                                        <li><i class="icon-remove"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
-                                        <li><i class="icon-remove"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
                                         <li><i class="icon-ok"></i> <strong>Collected:</strong> <?php echo '$'.$project['fundSoFar']?></li>
-                                        <li><i class="icon-ok"></i> <strong>By:</strong> <?php $pOname = $project['pOwner']; echo "<a href='user.php?username=$pOname'>$pOname</a>" ?></li>
+                                        <li><i class="icon-ok"></i> <strong>Status:</strong> <?php echo $project['pstatus']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Owner:</strong> <?php $pOname = $project['pOwner']; echo "<a href='user.php?username=$pOname'>$pOname</a>" ?></li>
                                     </ul>
 
                                     <?php
                                     displaytags($result);
                                     ?>
-
-
+                                    <div class="text-center">
                                     <?php
                                     if ($_SESSION['username'] == $project['pOwner']) {
-                                        echo "<a href='updateProject.php?pid=$pid' class='button button-3d button-rounded button-teal'>Update your project</a>";
+                                        echo "<a href='updateProject.php?pid=$pid' class='button button-3d btn-block button-rounded button-teal'>Update your project</a>";
                                     }
+                                    try {
+                                        $stmt = $pdo->query("select * from UserLikes where username='$username' and pid=$pid");
+                                    } catch (Exception $e) {
+                                        warningMessage($e -> getMessage());
+                                    }
+                                    $hasLike = $stmt->fetch();
+                                    if (isset($hasLike)) {
+                                        echo "<button class=\"button btn-block button-3d\" disabled>Liked</button>";
+
+                                    } else {
+                                        echo "<a href='likeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Like the project</a>";
+                                    }
+                                    echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
                                     ?>
+                                    </div>
 
                                 </div>
                             </div>
-
-							<div class="widget widget-twitter-feed clearfix">
-
-								<h4>Twitter Feed</h4>
-								<ul class="iconlist twitter-feed" data-username="envato" data-count="2">
-									<li></li>
-								</ul>
-
-								<a href="#" class="btn btn-default btn-sm fright">Follow Us on Twitter</a>
-
-							</div>
 
 							<div class="widget clearfix">
 
