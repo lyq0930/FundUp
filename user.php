@@ -7,15 +7,15 @@
  */
 require_once ('include/header.html');
 require_once ('include/dbconfig.php');
-//$username = $_GET['username'];
-$username = 'HappyBoy';
+$username = $_SESSION['username'];
+$aPerson = $_GET['username'];
 $pdo = db_connect();
 $stmt = $pdo -> prepare(
     "Select *
                From Users
                WHERE username = :username"
 );
-$stmt -> execute([':username' => $username]);
+$stmt -> execute([':username' => $aPerson]);
 $result = $stmt -> fetch();
 
 $email = $result['email'];
@@ -29,7 +29,7 @@ $stmt = $pdo -> prepare(
                     FROM Fund
                     WHERE username = :username and moneyStatus = 'Released'"
 );
-$stmt -> execute([':username' => $username]);
+$stmt -> execute([':username' => $aPerson]);
 $moneyResult = $stmt -> fetch();
 
 $money = $moneyResult['allMoney'];
@@ -41,7 +41,7 @@ $stmt = $pdo -> prepare(
                From Project
                WHERE pOwner = :username"
 );
-$stmt -> execute([':username' => $username]);
+$stmt -> execute([':username' => $aPerson]);
 $project = $stmt -> fetchAll();
 
 function showProject($project){
@@ -83,7 +83,7 @@ $stmt = $pdo -> prepare(
                   ORDER BY createT
                   LIMIT 3"
 );
-$stmt -> execute([':username' => $username]);
+$stmt -> execute([':username' => $aPerson]);
 $likedProject = $stmt -> fetchAll();
 
 function showLikedProject($likedProject){
@@ -94,11 +94,11 @@ function showLikedProject($likedProject){
     echo "
         <div class='spost clearfix'>
             <div class='entry-image'>
-                <a href='projectimage.php?pid=$pid' class='nobg'><img src='projectimage.php?pid=$pid' alt=''></a>
+                <a href='project.php?pid=$pid' class='nobg'><img src='projectimage.php?pid=$pid' alt=''></a>
             </div>
             <div class='entry-c'>
                 <div class='entry-title'>
-                    <h4><a href='projectimage.php?pid=$pid'>$pname</a></h4>
+                    <h4><a href='project.php?pid=$pid'>$pname</a></h4>
                 </div>
                 <ul class='entry-meta'>
                     <li>$createT</li>
@@ -116,7 +116,7 @@ $stmt = $pdo -> prepare(
                   ORDER BY commentPostedTime
                   LIMIT 3"
 );
-$stmt -> execute([':username' => $username]);
+$stmt -> execute([':username' => $aPerson]);
 $commented = $stmt -> fetchAll();
 
 function showComments($commented){
@@ -177,7 +177,7 @@ function showComments($commented){
                             </a>
                         </div>
                         <div class="portfolio-desc">
-                            <h3><a href="portfolio-single.html"><?php echo $username; ?></a></h3>
+                            <h3><a href="portfolio-single.html"><?php echo $aPerson; ?></a></h3>
                             <p><?php echo 'Email: '.$email.'</br>';
                                      echo 'Hometown: '.$hometown.'</br>';
                                      echo 'Interest: '.$interest;
@@ -195,12 +195,20 @@ function showComments($commented){
                                 <i class="icon-gplus"></i>
                                 <i class="icon-gplus"></i>
                             </a>
+                            <br>
+                            <?php
+                            if ($_SESSION['username'] != $aPerson) {
+                                $stmt = $pdo -> query("select * from UserFollow where username='$username' and followee='$aPerson'");
+                                $result = $stmt -> fetch();
+                                if ($result!= null and sizeof($result) > 0) {
+                                    echo "<a href='unfollow.php?followee=$aPerson' class='button button-3d btn-lg button-rounded button-brown'>Unfollow</a>";
+                                } else {
+                                    echo "<a href='follow.php?followee=$aPerson' class='button button-3d btn-lg button-rounded button-green'>Follow</a>";
+                                }
+                            }
+                            ?>
                         </div>
-                        <?php
-                        if ($_SESSION['username'] != $username) {
-                            //TODO add button
-                        }
-                        ?>
+
                     </article>
 
                     <div class="container clearfix">
