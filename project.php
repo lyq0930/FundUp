@@ -69,7 +69,7 @@ $stmt -> execute([':pid' => $pid]);
 $projectDiscussion = $stmt -> fetchAll();
 
 function displayComments($username, $aComment, $commentPostedTime) {
-    $commentPostedTime = date_format(date_create($commentPostedTime), 'Y-m-d h:m:s');
+//    $commentPostedTime = date_format(date_create($commentPostedTime), 'Y-m-d H:m:s');
     echo "
     <div id='comment-1' class='comment-wrap clearfix'>
 
@@ -240,7 +240,7 @@ function relatedPost($record,$pdo){
                                         foreach ($projectUpdates as $row) {
                                             $updateTime = $row['updateTime'];
                                             $updateDescription = $row['updateDescription'];
-                                            $updateTimeDisplay = date_format(date_create($updateTime), 'Y-m-d h:m:s');
+                                            $updateTimeDisplay = $updateTime;
                                             echo "<i class='icon-calendar3'></i>Update at $updateTimeDisplay";
                                             echo "<img src='projectimage.php?pid=$pid&updateTime=$updateTime' alt='Blog Single''>";
                                             echo "<p>$updateDescription</p>";
@@ -335,10 +335,7 @@ function relatedPost($record,$pdo){
 										<div class="col_full nobottommargin">
 											<button name="submit" type="submit" id="submit-button" tabindex="5" value="Submit" class="button button-3d nomargin">Submit Comment</button>
 										</div>
-                                        <input id="input-" type="number" class="rating" min="1" max="5" data-size="sm">
 
-                                        <label for="input-1" class="control-label">Rate This</label>
-                                        <input id="input-1" name="input-1" class="rating rating-loading" data-min="0" data-max="5" data-step="1">
                                     </form>
 
 								</div><!-- #respond end -->
@@ -360,7 +357,10 @@ function relatedPost($record,$pdo){
                                 <div class="portfolio-desc">
                                     <ul class="iconlist">
                                         <li><i class="icon-ok"></i> <strong>Created:</strong> <?php echo $project['createT']?></li>
-                                        <li><i class="icon-ok"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Fund end at:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Min Fund:</strong> <?php echo $project['minFund']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Max Fund:</strong> <?php echo $project['maxFund']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Fund SoFar:</strong> <?php echo $project['fundSoFar']?></li>
                                         <li><i class="icon-ok"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
                                         <li><i class="icon-ok"></i> <strong>Collected:</strong> <?php echo '$'.$project['fundSoFar']?></li>
                                         <li><i class="icon-ok"></i> <strong>Status:</strong> <?php echo $project['pstatus']?></li>
@@ -385,13 +385,14 @@ function relatedPost($record,$pdo){
                                         warningMessage($e -> getMessage());
                                     }
                                     $hasLike = $stmt->fetch();
-                                    if (isset($hasLike)) {
+                                    if ($hasLike == true) {
                                         echo "<button class=\"button btn-block button-3d\" disabled>Liked</button>";
-
                                     } else {
                                         echo "<a href='likeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Like the project</a>";
                                     }
-                                    echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
+                                    if ($project['pstatus'] == "Funding") {
+                                        echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
+                                    }
 
                                     if($project['pstatus'] == "Completed") {
                                         echo "<form id='project-basic' name='project-basic' class='nobottommargin' action='rateProject.php' method='post' enctype='multipart/form-data'>";

@@ -18,9 +18,9 @@ $pdo = db_connect();
 
 //GET ORDER HISTORY
 $stmt = $pdo -> prepare(
-    "Select F.fundPostedTime, F.fundAmount, P.pstatus, P.pid, P.pstatus, P.pname
+    "Select F.fundPostedTime, F.fundAmount, P.pstatus, P.pid, P.pstatus, P.pname, F.moneyStatus
                From Fund F JOIN Project P using (pid)
-               WHERE username = :username and F.moneyStatus = 'Released'"
+               WHERE username = :username"
 );
 $stmt -> execute([':username' => $username]);
 $result = $stmt -> fetchAll();
@@ -33,6 +33,7 @@ function showHistory($result)
     $amount = $result['fundAmount'];
     $projectStatus = $result['pstatus'];
     $pname = $result['pname'];
+    $moneyStatus = $result['moneyStatus'];
     
     echo "
         <tr class='cart_item'>
@@ -53,6 +54,10 @@ function showHistory($result)
         
             <td class='cart-product-name'>
                 <span class='Date'>$projectStatus</span>
+            </td>
+            
+            <td class='cart-product-name'>
+                <span class='Date'>$moneyStatus</span>
             </td>
         
             <td class='cart-product-price'>
@@ -94,6 +99,7 @@ function showHistory($result)
                         <th class="cart-product-name">Project</th>
                         <th class="cart-product-name">Date</th>
                         <th class="cart-product-name">Project Status</th>
+                        <th class="cart-product-name">Money Status</th>
                         <th class="cart-product-price">Price</th>
                     </tr>
                     </thead>

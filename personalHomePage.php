@@ -4,6 +4,7 @@ require_once ('include/helpfulFunctions.php');
 require_once ('include/dbconfig.php');
 require_once('include/header.php');
 $pdo = db_connect();
+$username = $_SESSION['username'];
 $youCreatedProject = $pdo -> prepare(
     "SELECT distinct pid, pname, powner, pdescription, fundSoFar, tags, pstatus, endFundTime
                FROM Project P
@@ -297,7 +298,7 @@ function showLogs($log){
 								<ul class="iconlist twitter-feed" data-username="envato" data-count="2">
 									<li></li>
 								</ul>
-                                <a href="#" class="button button-3d button-rounded button-teal">bo your profile</a>
+                                <a href="user.php?username=<?php echo $username;?>" class="button button-3d button-rounded button-teal">Go your profile</a>
                                 <a href="newproject.php" class="button button-3d button-rounded button-teal">Create a new project</a>
 							</div>
 
@@ -314,7 +315,7 @@ function showLogs($log){
                             </div>
 
                             <div class="widget clearfix">
-                                <h4>Recent Activities</h4>
+                                <h4>Recent Comments</h4>
                                 <?php
                                 foreach($commented as $row) {
                                     showComments($row);
@@ -323,7 +324,7 @@ function showLogs($log){
                             </div>
 
                             <div class="widget clearfix">
-                                <h4>Recent Comments</h4>
+                                <h4>Recent Activities</h4>
                                 <?php
                                 $log = $pdo -> prepare(
                                     "select *
