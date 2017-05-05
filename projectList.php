@@ -1,5 +1,5 @@
 <?php
-require_once ('include/header.html');
+require_once('include/header.php');
 ?>
 
 		<!-- Page Title

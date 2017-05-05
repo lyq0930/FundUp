@@ -2,7 +2,7 @@
 session_start();
 require_once ('include/helpfulFunctions.php');
 require_once ('include/dbconfig.php');
-require_once ('include/header.html');
+require_once('include/header.php');
 $pdo = db_connect();
 $youCreatedProject = $pdo -> prepare(
     "SELECT distinct pid, pname, powner, pdescription, fundSoFar, tags, pstatus, endFundTime

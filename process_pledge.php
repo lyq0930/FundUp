@@ -8,7 +8,7 @@
 session_start();
 require_once ('include/helpfulFunctions.php');
 require_once ('include/dbconfig.php');
-require_once ('include/header.html');
+require_once('include/header.php');
 $pid = $_POST['pid'];
 $username = $_SESSION['username'];
 if (isset($_POST['card-number-selecter'])) {

@@ -5,10 +5,10 @@
  * Date: 5/5/17
  * Time: 1:50 AM
  */
-require_once ('include/header.html');
+require_once('include/header.php');
 require_once ('include/dbconfig.php');
-//$username = $_GET['username'];
-$username = 'HappyBoy';
+$username = $_GET['username'];
+//$username = 'HappyBoy';
 $pdo = db_connect();
 $stmt = $pdo -> prepare(
     "Select *

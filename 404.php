@@ -1,4 +1,4 @@
-<?php require_once ('include/header.html'); ?>
+<?php require_once('include/header.php'); ?>
 <!-- Page Title
 ============================================= -->
 <section id="page-title">

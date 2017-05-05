@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once ("include/dbconfig.php");
-require_once ("include/header.html");
+require_once("include/header.php");
 /**
  * Created by PhpStorm.
  * User: louis

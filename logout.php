@@ -8,7 +8,7 @@
 session_start();
 session_destroy();
 require_once ("include/helpfulFunctions.php");
-require_once ("include/header.html");
+require_once("include/header.php");
 correctMessage('Log out successfully, redirecting to homepage...');
 echo "<meta http-equiv='refresh' content='2; url=index.php'>";
 require_once ("include/footer.html");
