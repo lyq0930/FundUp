@@ -88,6 +88,95 @@ function displayComments($username, $aComment, $commentPostedTime) {
     </div>
     ";
 }
+
+function relatedPost($record,$pdo){
+    $tags = $record['tags'];
+    $tagsArray = explode(",", $tags);
+
+    $stmt1 = $pdo -> prepare(
+            "SELECT pid, pname, pdescription, pOwner, tags, Date(projectCreatedTime) createT, Date(endFundTime) endFT,
+                      Date(completionDate) endPT, minFund, maxFund, fundSoFar, pstatus, cover
+               FROM Project
+               WHERE tags LIKE :tag1
+               ORDER BY createT DESC
+               LIMIT 2"
+    );
+
+    $stmt2 = $pdo -> prepare(
+        "SELECT pid, pname, pdescription, pOwner, tags, Date(projectCreatedTime) createT, Date(endFundTime) endFT,
+                      Date(completionDate) endPT, minFund, maxFund, fundSoFar, pstatus, cover
+               FROM Project
+               WHERE tags LIKE :tag2
+               ORDER BY createT DESC
+               LIMIT 2"
+    );
+    $tag1 = "%".$tagsArray[0]."%";
+    $tag2 = "%".$tagsArray[1]."%";
+    $stmt1 -> execute([':tag1' => $tag1]);
+    $result1 = $stmt1 -> fetchAll();
+
+
+    $title1 = $result1[0]['pname'];
+    $createdTime1 = $result1[0]['createT'];
+    $description1 = $result1[0]['pdescription'];
+    $pid1 = $result1[0]['pid'];
+    $pname1 = $result1[0]['pname'];
+
+    $stmt2 -> execute([':tag2' => $tag2]);
+    $result2 = $stmt2 -> fetchAll();
+
+    $title2 = $result2[0]['pname'];
+    $createdTime2 = $result2[0]['createT'];
+    $description2 = $result2[0]['pdescription'];
+    $pid2 = $result2[0]['pid'];
+    $pname2 = $result2[0]['pname'];
+
+    echo "
+    <h4>Related Posts:</h4>
+
+							<div class='related-posts clearfix'>
+
+								<div class='col_half nobottommargin'>
+								    
+
+									<div class='mpost clearfix'>
+										<div class='entry-image'>
+											<a href='#'><img src='projectimage.php?pid=$pid1' alt=$pname1></a>
+										</div>
+										<div class='entry-c'>
+											<div class='entry-title'>
+												<h4><a href='project.php?pid=$pid1'>$title1</a></h4>
+											</div>
+											<ul class='entry-meta clearfix'>
+												<li><i class='icon-calendar3'></i> $createdTime1</li>
+											</ul>
+											<div class='entry-content'>$description1</div>
+										</div>
+									</div>
+
+								</div>
+								
+								<div class='col_half nobottommargin col_last'>
+
+									<div class='mpost clearfix'>
+										<div class='entry-image'>
+											<a href='#'><img src='projectimage.php?pid=$pid2' alt=$pname2></a>
+										</div>
+										<div class='entry-c'>
+											<div class='entry-title'>
+												<h4><a href='project.php?pid=$pid2'>$title2</a></h4>
+											</div>
+											<ul class='entry-meta clearfix'>
+												<li><i class='icon-calendar3'></i>$createdTime2</li>
+											</ul>
+											<div class='entry-content'>$description2</div>
+										</div>
+									</div>
+
+								</div>
+							
+    ";
+}
 ?>
 
 
@@ -228,6 +317,18 @@ function displayComments($username, $aComment, $commentPostedTime) {
 									Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores, eveniet, eligendi et nobis neque minus mollitia sit repudiandae ad repellendus recusandae blanditiis praesentium vitae ab sint earum voluptate velit beatae alias fugit accusantium laboriosam nisi reiciendis deleniti tenetur molestiae maxime id quaerat consequatur fugiat aliquam laborum nam aliquid. Consectetur, perferendis?
 								</div>
 							</div><!-- Post Single - Author End -->
+
+
+							<div class="line"></div>
+
+                            <?php
+                            relatedPost($result,$pdo);
+                            ?>
+
+
+
+							</div>
+
                             <!-- Comments
 							============================================= -->
 							<div id="comments" class="clearfix">

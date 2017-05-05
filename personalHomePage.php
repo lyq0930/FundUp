@@ -183,12 +183,11 @@ function projectPost($pid, $pname, $powner, $tags, $pdescription, $endFundTime, 
 						<div class="sidebar-widgets-wrap">
 
 							<div class="widget widget-twitter-feed clearfix">
-
 								<h4>Actions</h4>
 								<ul class="iconlist twitter-feed" data-username="envato" data-count="2">
 									<li></li>
 								</ul>
-                                <a href="#" class="button button-3d button-rounded button-teal">Update your profile</a>
+                                <a href="#" class="button button-3d button-rounded button-teal">bo your profile</a>
                                 <a href="newproject.php" class="button button-3d button-rounded button-teal">Create a new project</a>
 							</div>
 
