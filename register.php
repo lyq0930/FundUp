@@ -8,7 +8,7 @@
 session_start();
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
-require_once ('include/header.html');
+require_once('include/header.php');
 try {
     $conn = db_connect();
     $stmt = $conn->prepare("call CreateUser(:username, :password, :fullname, :email, :phoneNum)");

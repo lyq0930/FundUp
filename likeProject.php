@@ -1,11 +1,22 @@
 <?php
 session_start();
-require_once ('include/header.html');
+require_once('include/header.php');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 $pid = $_GET['pid'];
 $username = $_SESSION['username'];
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+    "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "like";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $pid, $pdo::PARAM_INT);
+$log -> execute();
+
 $stmt = $pdo -> prepare(
         "insert into UserLikes(username, pid) 
                    values(:username, :pid)");

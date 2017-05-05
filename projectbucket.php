@@ -1,10 +1,22 @@
 <?php
-require_once ('include/header.html');
+require_once('include/header.php');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 
+$username = $_SESSION['username'];
 $tags = $_GET['tag'];
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+    "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "look tag";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $tags, $pdo::PARAM_STR);
+$log -> execute();
+
 $stmt = $pdo -> prepare(
     "Select pid, pname, pdescription, pOwner, tags, Date(projectCreatedTime) createT, Date(endFundTime) endFT,
                           Date(completionDate) endPT, minFund, maxFund, fundSoFar, pstatus, cover
@@ -67,15 +79,16 @@ function showProject($singleResult) {
 
 				<div class="container clearfix">
 
-					<!-- Portfolio Filter
-					============================================= -->
-					<ul id="portfolio-filter" class="portfolio-filter clearfix" data-container="#portfolio">
+<!--					<!-- Portfolio Filter-->
+<!--					============================================= -->
+<!--					<ul id="portfolio-filter" class="portfolio-filter clearfix" data-container="#portfolio">-->
+<!---->
+<!--                        <li class="activeFilter"><a href="projectAll.php" data-filter="*">Show All</a></li>-->
+<!--                        <li><a data-filter=".pf-icons">--><?php //echo $tags; ?><!--</a></li>-->
+<!---->
+<!--					</ul><!-- #portfolio-filter end -->
 
-						<li class="activeFilter"><a href="#" data-filter="*">Show All</a></li>
-						<li><a data-filter=".pf-icons"><?php echo $tags; ?></a></li>
-
-					</ul><!-- #portfolio-filter end -->
-
+                    <h2>Tag: <?php echo $_GET['tag']?></h2>
 					<div id="portfolio-shuffle" class="portfolio-shuffle" data-container="#portfolio">
 						<i class="icon-random"></i>
 					</div>

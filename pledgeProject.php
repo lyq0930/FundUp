@@ -6,7 +6,7 @@
      * Time: 10:28 AM
      */
     session_start();
-    require_once ('include/header.html');
+    require_once('include/header.php');
     require_once ('include/dbconfig.php');
     $pdo = db_connect();
     $pid = $_GET['pid'];

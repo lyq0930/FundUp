@@ -1,11 +1,22 @@
 <?php
 session_start();
-require_once ('include/header.html');
+require_once ('include/header.php');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 $username = $_SESSION['username'];
 $followee = $_GET['followee'];
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+    "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "follow";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $followee, $pdo::PARAM_STR);
+$log -> execute();
+
 $stmt = $pdo -> prepare(
         "insert into UserFollow(username, followee) 
                    values(:username, :followee)");

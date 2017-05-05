@@ -8,7 +8,7 @@
 session_start();
 require_once ('include/helpfulFunctions.php');
 require_once ('include/dbconfig.php');
-require_once ('include/header.html');
+require_once('include/header.php');
 $pid = $_POST['pid'];
 $username = $_SESSION['username'];
 if (isset($_POST['card-number-selecter'])) {
@@ -18,6 +18,16 @@ if (isset($_POST['card-number-selecter'])) {
 }
 $amount = $_POST['pledgeAmount'];
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+    "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "pledge";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $pid, $pdo::PARAM_INT);
+$log -> execute();
 
 if (isset($_POST['name-on-card'])) {
     $nameoncard=$_POST['name-on-card'];
@@ -66,7 +76,6 @@ $stmt -> bindParam(":cardNumber", $cardNum, $pdo::PARAM_STR);
 try {
     $result = $stmt->execute();
 } catch (Exception $e) {
-    warningMessage($e->getMessage());
 }
 $actualAmount = $pdo -> query("select @actualAmount") -> fetch();
 
@@ -74,7 +83,7 @@ if (isset($result)) {
     correctMessage("Pledge succeed! ". "You actually pledged " . $actualAmount['@actualAmount'] ." Redirecting to project page");
     echo "<meta http-equiv='refresh' content='5; url=project.php?pid=$pid'>";
 } else {
-    warningMessage("Unable to add pledge, maybe the project has been funded successfully");
+    warningMessage("Sorry, you have pledged before.");
     echo "<meta http-equiv='refresh' content='5; url=project.php?pid=$pid'>";
 
 }

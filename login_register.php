@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("include/header.html");
+require_once("include/header.php");
 require_once("include/helpfulFunctions.php");
 ?>
 

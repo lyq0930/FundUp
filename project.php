@@ -1,11 +1,22 @@
 <?php
 session_start();
-require_once ('include/header.html');
+require_once('include/header.php');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 $pid = $_GET['pid'];
 $username = $_SESSION['username'];
 $pdo = db_connect();
+
+$log = $pdo -> prepare(
+        "insert into log(username, operation, target)
+                   values (:username, :operation, :target)"
+);
+$operation = "look project";
+$log -> bindParam(":username", $username, $pdo::PARAM_STR);
+$log -> bindParam(":operation", $operation, $pdo::PARAM_STR);
+$log -> bindParam(":target", $pid, $pdo::PARAM_INT);
+$log -> execute();
+
 
 $stmt = $pdo -> prepare(
         "Select pid, pname, pdescription, pOwner, tags, Date(projectCreatedTime) createT, Date(endFundTime) endFT,
@@ -58,7 +69,7 @@ $stmt -> execute([':pid' => $pid]);
 $projectDiscussion = $stmt -> fetchAll();
 
 function displayComments($username, $aComment, $commentPostedTime) {
-    $commentPostedTime = date_format(date_create($commentPostedTime), 'Y-m-d h:m:s');
+//    $commentPostedTime = date_format(date_create($commentPostedTime), 'Y-m-d H:m:s');
     echo "
     <div id='comment-1' class='comment-wrap clearfix'>
 
@@ -178,8 +189,6 @@ function relatedPost($record,$pdo){
     ";
 }
 ?>
-
-
 		<!-- Page Title
 		============================================= -->
 		<section id="page-title">
@@ -213,16 +222,6 @@ function relatedPost($record,$pdo){
 									<h2><?php echo $project['pname']?></h2>
 								</div><!-- .entry-title end -->
 
-								<!-- Entry Meta
-								============================================= -->
-								<ul class="entry-meta clearfix">
-									<li><i class="icon-calendar3"></i>End in <?php echo $project['endFundTime']?></li>
-									<li><a href="#"><i class="icon-user"></i> admin</a></li>
-									<li><i class="icon-folder-open"></i> <a href="#">General</a>, <a href="#">Media</a></li>
-									<li><a href="#"><i class="icon-comments"></i> 43 Comments</a></li>
-									<li><a href="#"><i class="icon-camera-retro"></i></a></li>
-								</ul><!-- .entry-meta end -->
-
 								<!-- Entry Image
 								============================================= -->
 								<div class="entry-image">
@@ -241,7 +240,7 @@ function relatedPost($record,$pdo){
                                         foreach ($projectUpdates as $row) {
                                             $updateTime = $row['updateTime'];
                                             $updateDescription = $row['updateDescription'];
-                                            $updateTimeDisplay = date_format(date_create($updateTime), 'Y-m-d h:m:s');
+                                            $updateTimeDisplay = $updateTime;
                                             echo "<i class='icon-calendar3'></i>Update at $updateTimeDisplay";
                                             echo "<img src='projectimage.php?pid=$pid&updateTime=$updateTime' alt='Blog Single''>";
                                             echo "<p>$updateDescription</p>";
@@ -337,7 +336,7 @@ function relatedPost($record,$pdo){
 											<button name="submit" type="submit" id="submit-button" tabindex="5" value="Submit" class="button button-3d nomargin">Submit Comment</button>
 										</div>
 
-									</form>
+                                    </form>
 
 								</div><!-- #respond end -->
 
@@ -358,7 +357,10 @@ function relatedPost($record,$pdo){
                                 <div class="portfolio-desc">
                                     <ul class="iconlist">
                                         <li><i class="icon-ok"></i> <strong>Created:</strong> <?php echo $project['createT']?></li>
-                                        <li><i class="icon-ok"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Fund end at:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Min Fund:</strong> <?php echo $project['minFund']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Max Fund:</strong> <?php echo $project['maxFund']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Fund SoFar:</strong> <?php echo $project['fundSoFar']?></li>
                                         <li><i class="icon-ok"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
                                         <li><i class="icon-ok"></i> <strong>Collected:</strong> <?php echo '$'.$project['fundSoFar']?></li>
                                         <li><i class="icon-ok"></i> <strong>Status:</strong> <?php echo $project['pstatus']?></li>
@@ -368,6 +370,7 @@ function relatedPost($record,$pdo){
                                     <?php
                                     displaytags($result);
                                     ?>
+
                                     <div class="text-center">
                                     <?php
                                     if ($_SESSION['username'] == $project['pOwner']) {
@@ -382,40 +385,29 @@ function relatedPost($record,$pdo){
                                         warningMessage($e -> getMessage());
                                     }
                                     $hasLike = $stmt->fetch();
-                                    if (isset($hasLike)) {
+                                    if ($hasLike == true) {
                                         echo "<button class=\"button btn-block button-3d\" disabled>Liked</button>";
-
                                     } else {
                                         echo "<a href='likeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Like the project</a>";
                                     }
-                                    echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
+                                    if ($project['pstatus'] == "Funding") {
+                                        echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
+                                    }
+
+                                    if($project['pstatus'] == "Completed") {
+                                        echo "<form id='project-basic' name='project-basic' class='nobottommargin' action='rateProject.php' method='post' enctype='multipart/form-data'>";
+//                                        echo "<lable>Rate the project</lable>";
+                                        echo "<input type='hidden' name='pid' value='$pid' />";
+                                        echo "<input type='text' name='stars' placeholder='1-5 stars' class='form-control'/>";
+                                        echo "<button type=\"submit\" class=\"button button-3d\">Rate</button>";
+                                        echo "</form>";
+                                        //echo "<a href='process_completeProject.php?pid=$pid' class='button button-3d btn-block button-rounded button-teal'>Mark it complete</a>";
+                                    }
                                     ?>
                                     </div>
 
                                 </div>
                             </div>
-
-<!--                            <div class="widget clearfix">-->
-<!--                                <h4>Recent Liked Posts</h4>-->
-<!--                                <div id="post-list-footer">-->
-<!---->
-<!--                                    --><?php
-//                                    foreach($likedProject as $row) {
-//                                        showLikedProject($row);
-//                                    }
-//                                    ?>
-<!--                                </div>-->
-<!--                            </div>-->
-<!---->
-<!--                            <div class="widget clearfix">-->
-<!--                                <h4>Recent Comments</h4>-->
-<!--                                --><?php
-//                                foreach($commented as $row) {
-//                                    showComments($row);
-//                                }
-//                                ?>
-<!--                            </div>-->
-
 						</div>
 
 					</div><!-- .sidebar end -->

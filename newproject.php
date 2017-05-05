@@ -6,7 +6,7 @@
  * Time: 10:28 AM
  */
 session_start();
-require_once ('include/header.html');
+require_once('include/header.php');
 ?>
 
     <!-- Page Title
