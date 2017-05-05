@@ -99,7 +99,7 @@ CREATE TABLE Fund (
     pid INT NOT NULL,
     fundPostedTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     paymentCard VARCHAR(30) NOT NULL,
-    fundAmount DECIMAL(10 , 2 ) NOT NULL CHECK (fundAmount > 0),
+    fundAmount DECIMAL(10 , 2 ) NOT NULL CHECK (fundAmount >= 0),
     moneyStatus VARCHAR(30) NOT NULL default "pending",
     PRIMARY KEY (username , pid),
     FOREIGN KEY (username)

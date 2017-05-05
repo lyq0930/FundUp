@@ -4,6 +4,7 @@ require_once ('include/header.html');
 require_once ('include/dbconfig.php');
 require_once ('include/helpfulFunctions.php');
 $pid = $_GET['pid'];
+$username = $_SESSION['username'];
 $pdo = db_connect();
 
 $stmt = $pdo -> prepare(
@@ -235,6 +236,7 @@ function relatedPost($record,$pdo){
                                     <p><?php echo $project['pdescription'];?></p>
                                     <?php
                                     if (isset($projectUpdates)) {
+                                        echo "<div class='line'></div>";
                                         echo "<h4>Update</h4>";
                                         foreach ($projectUpdates as $row) {
                                             $updateTime = $row['updateTime'];
@@ -316,6 +318,7 @@ function relatedPost($record,$pdo){
 								</div>
 							</div><!-- Post Single - Author End -->
 
+
 							<div class="line"></div>
 
                             <?php
@@ -325,7 +328,8 @@ function relatedPost($record,$pdo){
 
 
 							</div>
-							<!-- Comments
+
+                            <!-- Comments
 							============================================= -->
 							<div id="comments" class="clearfix">
 
@@ -385,36 +389,39 @@ function relatedPost($record,$pdo){
                                 <div class="portfolio-desc">
                                     <ul class="iconlist">
                                         <li><i class="icon-ok"></i> <strong>Created:</strong> <?php echo $project['createT']?></li>
-                                        <li><i class="icon-remove"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
-                                        <li><i class="icon-remove"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>End Fund:</strong> <?php echo $project['endFT']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Complete:</strong> <?php echo $project['endPT']?></li>
                                         <li><i class="icon-ok"></i> <strong>Collected:</strong> <?php echo '$'.$project['fundSoFar']?></li>
-                                        <li><i class="icon-ok"></i> <strong>By:</strong> <?php $pOname = $project['pOwner']; echo "<a href='user.php?username=$pOname'>$pOname</a>" ?></li>
+                                        <li><i class="icon-ok"></i> <strong>Status:</strong> <?php echo $project['pstatus']?></li>
+                                        <li><i class="icon-ok"></i> <strong>Owner:</strong> <?php $pOname = $project['pOwner']; echo "<a href='user.php?username=$pOname'>$pOname</a>" ?></li>
                                     </ul>
 
                                     <?php
                                     displaytags($result);
                                     ?>
-
-
+                                    <div class="text-center">
                                     <?php
                                     if ($_SESSION['username'] == $project['pOwner']) {
-                                        echo "<a href='updateProject.php?pid=$pid' class='button button-3d button-rounded button-teal'>Update your project</a>";
+                                        echo "<a href='updateProject.php?pid=$pid' class='button button-3d btn-block button-rounded button-teal'>Update your project</a>";
                                     }
+                                    try {
+                                        $stmt = $pdo->query("select * from UserLikes where username='$username' and pid=$pid");
+                                    } catch (Exception $e) {
+                                        warningMessage($e -> getMessage());
+                                    }
+                                    $hasLike = $stmt->fetch();
+                                    if (isset($hasLike)) {
+                                        echo "<button class=\"button btn-block button-3d\" disabled>Liked</button>";
+
+                                    } else {
+                                        echo "<a href='likeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Like the project</a>";
+                                    }
+                                    echo "<a href='pledgeProject.php?pid=$pid&username=$username' class='button button-3d btn-block button-rounded button-green'>Pledge the project</a>";
                                     ?>
+                                    </div>
 
                                 </div>
                             </div>
-
-							<div class="widget widget-twitter-feed clearfix">
-
-								<h4>Twitter Feed</h4>
-								<ul class="iconlist twitter-feed" data-username="envato" data-count="2">
-									<li></li>
-								</ul>
-
-								<a href="#" class="btn btn-default btn-sm fright">Follow Us on Twitter</a>
-
-							</div>
 
 							<div class="widget clearfix">
 
